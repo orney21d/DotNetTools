@@ -1,7 +1,6 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
-using System;
 using System.Collections.Generic;
 using Microsoft.DotNet.Watcher.Tools;
 using Microsoft.Extensions.CommandLineUtils;
@@ -16,9 +15,11 @@ namespace Microsoft.DotNet.Watcher
         public bool IsQuiet { get; private set; }
         public bool IsVerbose { get; private set; }
         public IList<string> RemainingArguments { get; private set; }
+
         public static CommandLineOptions Parse(string[] args, IConsole console)
         {
             Ensure.NotNull(args, nameof(args));
+            Ensure.NotNull(console, nameof(console));
 
             var app = new CommandLineApplication(throwOnUnexpectedArg: false)
             {
@@ -79,7 +80,7 @@ Examples:
 
             if (optQuiet.HasValue() && optVerbose.HasValue())
             {
-                console.Error.WriteLine(Resources.Error_QuietAndVerboseSpecified.Bold().Red());
+                console.Error.WriteLine(Resources.Error_QuietAndVerboseSpecified);
                 return null;
             }
 
