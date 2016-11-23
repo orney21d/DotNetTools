@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" DefaultTargets="Default" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <!-- TODO use common build lifecycle -->
+
+    <Import Project="build\common.props" />
+
+    <PropertyGroup>
+        <ArtifactsPath>$(MSBuildThisFileDirectory)artifacts\build\</ArtifactsPath>
+        <SolutionFile>$(MSBuildThisFileDirectory)DotNetTools.sln</SolutionFile>
+    </PropertyGroup>
+    <ItemGroup>
+        <SourceProjects Include="src\*\*.csproj" />
+        <TestProjects Include="test\*\*.csproj" />
+    </ItemGroup>
+    <Target Name="Clean">
+        <RemoveDir Directories="$(ArtifactsPath);$(MSBuildThisFileDirectory)testWorkDir" />
+        <MSBuild Projects="$(SolutionFile)" Targets="Clean" />
+    </Target>
+    <Target Name="Initialize" DependsOnTargets="Clean">
+        <Message Importance="High" Text="Build settings:" />
+        <Message Importance="High" Text="DotnetCliVersion: $(DotnetCliVersion)" />
+        <MSBuild Projects="$(SolutionFile)" Targets="Restore" />
+    </Target>
+
+    <Target Name="Pack">
+        <MSBuild Targets="Rebuild;Pack"
+                 Projects="@(SourceProjects)"
+                 Properties="PackageOutputPath=$(ArtifactsPath)" />
+    </Target>
+
+    <Target Name="Test" DependsOnTargets="Initialize">
+        <MSBuild Targets="VSTest"
+                 Projects="@(TestProjects)" />
+    </Target>
+
+    <Target Name="Default" DependsOnTargets="Clean;Test;Pack" />
+</Project>
