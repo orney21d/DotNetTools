@@ -88,21 +88,20 @@ namespace Microsoft.DotNet.Watcher.Internal
 
                     if (exitCode == 0)
                     {
-                        var files = File.ReadAllLines(watchList)
-                            .Select(l => l?.Trim())
-                            .Where(l => !string.IsNullOrEmpty(l))
-                            .ToList();
+                        var fileset = new FileSet(
+                            File.ReadAllLines(watchList)
+                                .Select(l => l?.Trim())
+                                .Where(l => !string.IsNullOrEmpty(l)));
 
-                        Debug.Assert(files.All(Path.IsPathRooted), "All files should be rooted paths");
-
-                        var fileset = new FileSet(files);
-
-                        _reporter.Verbose($"Watching {files.Count} file(s) for changes");
+                        _reporter.Verbose($"Watching {fileset.Count} file(s) for changes");
 #if DEBUG
-                        foreach (var file in files)
+
+                        foreach (var file in fileset)
                         {
                             _reporter.Verbose($"  -> {file}");
                         }
+
+                        Debug.Assert(fileset.All(Path.IsPathRooted), "All files should be rooted paths");
 #endif
 
                         return fileset;
